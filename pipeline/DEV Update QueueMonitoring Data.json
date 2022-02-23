@@ -1,0 +1,167 @@
+{
+    "name": "DEV Update QueueMonitoring Data",
+    "properties": {
+        "description": "No Kusto Alerting Step",
+        "activities": [
+            {
+                "name": "Aggregate Metrics",
+                "type": "DatabricksNotebook",
+                "dependsOn": [
+                    {
+                        "activity": "Update Queue Length History",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    },
+                    {
+                        "activity": "Update Queue Metrics",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    },
+                    {
+                        "activity": "Update SLA Pressure",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    },
+                    {
+                        "activity": "Update Active Agents",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    }
+                ],
+                "policy": {
+                    "timeout": "0.00:45:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "notebookPath": "/Deployments/latest/projects/msaas_queuemonitoring/2_agg_queue_metrics.sql",
+                    "baseParameters": {
+                        "as_of_ts": {
+                            "value": "@formatDateTime(pipeline().parameters.trigger_start_time, 'yyyy-MM-dd HH:mm:ss')",
+                            "type": "Expression"
+                        }
+                    }
+                },
+                "linkedServiceName": {
+                    "referenceName": "LS_Dev_Databricks_ETL_Processing",
+                    "type": "LinkedServiceReference"
+                }
+            },
+            {
+                "name": "Update Queue Length History",
+                "type": "DatabricksNotebook",
+                "dependsOn": [],
+                "policy": {
+                    "timeout": "0.00:45:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "notebookPath": "/Deployments/latest/projects/msaas_queuemonitoring/1_update_queue_snapshot.sql",
+                    "baseParameters": {
+                        "as_of_ts": {
+                            "value": "@formatDateTime(pipeline().parameters.trigger_start_time, 'yyyy-MM-dd HH:mm:ss')",
+                            "type": "Expression"
+                        }
+                    }
+                },
+                "linkedServiceName": {
+                    "referenceName": "LS_Dev_Databricks_ETL_Processing",
+                    "type": "LinkedServiceReference"
+                }
+            },
+            {
+                "name": "Update Queue Metrics",
+                "type": "DatabricksNotebook",
+                "dependsOn": [],
+                "policy": {
+                    "timeout": "0.00:45:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "notebookPath": "/Deployments/latest/projects/msaas_queuemonitoring/1_update_queue_metrics.sql",
+                    "baseParameters": {
+                        "as_of_ts": {
+                            "value": "@formatDateTime(pipeline().parameters.trigger_start_time, 'yyyy-MM-dd HH:mm:ss')",
+                            "type": "Expression"
+                        }
+                    }
+                },
+                "linkedServiceName": {
+                    "referenceName": "LS_Dev_Databricks_ETL_Processing",
+                    "type": "LinkedServiceReference"
+                }
+            },
+            {
+                "name": "Update SLA Pressure",
+                "type": "DatabricksNotebook",
+                "dependsOn": [],
+                "policy": {
+                    "timeout": "0.00:45:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "notebookPath": "/Deployments/latest/projects/msaas_queuemonitoring/1_update_slapressure_snapshot.sql",
+                    "baseParameters": {
+                        "as_of_ts": {
+                            "value": "@formatDateTime(pipeline().parameters.trigger_start_time, 'yyyy-MM-dd HH:mm:ss')",
+                            "type": "Expression"
+                        }
+                    }
+                },
+                "linkedServiceName": {
+                    "referenceName": "LS_Dev_Databricks_ETL_Processing",
+                    "type": "LinkedServiceReference"
+                }
+            },
+            {
+                "name": "Update Active Agents",
+                "type": "DatabricksNotebook",
+                "dependsOn": [],
+                "policy": {
+                    "timeout": "0.00:45:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "notebookPath": "/Users/v-kalpsharma@microsoft.com/1_update_activeagent_snapshot.sql",
+                    "baseParameters": {
+                        "as_of_ts": {
+                            "value": "@formatDateTime(pipeline().parameters.trigger_start_time, 'yyyy-MM-dd HH:mm:ss')",
+                            "type": "Expression"
+                        }
+                    }
+                },
+                "linkedServiceName": {
+                    "referenceName": "LS_Dev_Databricks_ETL_Processing",
+                    "type": "LinkedServiceReference"
+                }
+            }
+        ],
+        "parameters": {
+            "trigger_start_time": {
+                "type": "String"
+            }
+        },
+        "folder": {
+            "name": "DEV/1 hr Runs"
+        },
+        "annotations": []
+    }
+}
